@@ -1,0 +1,1 @@
+panel serve --show app.py --dev
