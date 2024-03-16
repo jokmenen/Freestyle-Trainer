@@ -17,25 +17,25 @@ if WOORDENLIJST_NAME == 'ARI_JSON':
      # Woordenlijst from https://github.com/AriSaadon/NederlandseWoordenboek/tree/main
     with open('Woordenlijst.json', encoding='utf-8') as fp:
         dutch_words = json.load(fp)
-        print(dutch_words)
 
 # Function to randomly select Dutch words
 def generate_random_words(event=None):
 
     if toggle_definitions.value:
-        word_display_format = "# {word} <span style='color: grey; font-size: smaller;'>{definition_text}</span>\n"
+        word_display_format = "# {word:<{woordlength}}\n <span style='color: grey; font-size: small;'>\t\t{definition_text}</span>\n"
     else:
         word_display_format = "# {word}\n"
 
     words = random.sample(list(dutch_words.keys()), min(slider.value, len(dutch_words)))
     words_with_definitions = []
+    woordlength = len(max(words, key=len))
     for word in words:
         if WOORDENLIJST_NAME == 'opentaal_basiswoorden':
             definitions = get_definitions(word)
         elif WOORDENLIJST_NAME == 'ARI_JSON':
             definitions = dutch_words[word]
         definition_text = definitions[0] if definitions else "No definition found"
-        words_with_definitions.append(word_display_format.format(word=word, definition_text=definition_text))
+        words_with_definitions.append(word_display_format.format(word=word, woordlength = woordlength, definition_text=definition_text))
 
 
     random_words_pane.object = ' '.join(words_with_definitions)
@@ -52,7 +52,6 @@ random_words_pane = pn.pane.Markdown('# ')
 
 # Initial generation of random words
 generate_random_words()
-
 # Layout
 layout = pn.Row(pn.layout.HSpacer(), pn.Column( pn.layout.VSpacer(), slider, generate_button, random_words_pane, toggle_definitions, pn.layout.VSpacer()), pn.layout.HSpacer(), align='center')
 
