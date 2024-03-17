@@ -2,10 +2,11 @@ import panel as pn
 import random
 from get_definitions import get_definitions
 import json
+import pandas as pd
 
 pn.extension()
 
-WOORDENLIJST_NAME = 'ARI_JSON'
+WOORDENLIJST_NAME = 'common_words'
 
 if WOORDENLIJST_NAME == 'opentaal_basiswoorden':
      # Example list of Dutch words from https://github.com/OpenTaal/opentaal-wordlist/blob/master/elements/basiswoorden-gekeurd.txt
@@ -18,6 +19,21 @@ if WOORDENLIJST_NAME == 'ARI_JSON':
     with open('Woordenlijst.json', encoding='utf-8') as fp:
         dutch_words = json.load(fp)
 
+if WOORDENLIJST_NAME == 'common_words':
+    dutch_words = pd.read_csv('word_frequency_wikitionary_17_3_2024.csv', index_col=0).set_index('Word').to_dict()['definition']
+
+max_word_length_slider = pn.widgets.IntSlider(name='Max Word Length', start=1, end=20, value=10, visible=False)
+max_word_length_toggle = pn.widgets.Checkbox(name='Toggle Max Word Length', value = False)
+max_word_length_toggle.link(max_word_length_slider, value='visible')
+
+#TODO Finish wordlist selection.
+# # Define the options for the dropdown menu
+# dropdown_options = {'Option 1': 1, 'Option 2': 2, 'Option 3': 3}
+
+# # Create the dropdown widget
+# dropdown = pn.widgets.Select(name='Select Option', options=dropdown_options)
+
+
 # Function to randomly select Dutch words
 def generate_random_words(event=None):
 
@@ -26,7 +42,10 @@ def generate_random_words(event=None):
     else:
         word_display_format = "# {word}\n"
 
-    words = random.sample(list(dutch_words.keys()), min(slider.value, len(dutch_words)))
+    max_word_length = max_word_length_slider.value if max_word_length_toggle.value == True else 999999
+    filtered_words = {word: defs for word, defs in dutch_words.items() if len(word) <= max_word_length}
+
+    words = random.sample(list(filtered_words.keys()), min(slider.value, len(filtered_words)))
     words_with_definitions = []
     woordlength = len(max(words, key=len))
     for word in words:
@@ -34,6 +53,8 @@ def generate_random_words(event=None):
             definitions = get_definitions(word)
         elif WOORDENLIJST_NAME == 'ARI_JSON':
             definitions = dutch_words[word]
+        elif WOORDENLIJST_NAME == 'common_words':
+            definitions = [dutch_words[word]]
         definition_text = definitions[0] if definitions else "No definition found"
         words_with_definitions.append(word_display_format.format(word=word, woordlength = woordlength, definition_text=definition_text))
 
@@ -53,7 +74,7 @@ random_words_pane = pn.pane.Markdown('# ')
 # Initial generation of random words
 generate_random_words()
 # Layout
-layout = pn.Row(pn.layout.HSpacer(), pn.Column( pn.layout.VSpacer(), slider, generate_button, random_words_pane, toggle_definitions, pn.layout.VSpacer()), pn.layout.HSpacer(), align='center')
+layout = pn.Row(pn.layout.HSpacer(), pn.Column( pn.layout.VSpacer(), slider,max_word_length_slider,max_word_length_toggle, generate_button, random_words_pane, toggle_definitions, pn.layout.VSpacer()), pn.layout.HSpacer(), align='center')
 
 # css = """
 # .bk-root {
