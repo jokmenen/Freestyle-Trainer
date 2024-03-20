@@ -1,10 +1,14 @@
 import panel as pn
 import random
 from get_definitions import get_definitions
+from load_drills import create_tabs_from_md, define_sidebar_component
 import json
 import pandas as pd
 
 pn.extension(theme='dark')
+
+tabs = create_tabs_from_md()
+sidebar = define_sidebar_component(tabs)
 
 WOORDENLIJST_NAME = 'common_words'
 
@@ -74,7 +78,7 @@ random_words_pane = pn.pane.Markdown('# ')
 # Initial generation of random words
 generate_random_words()
 # Layout
-layout = pn.Row(pn.layout.HSpacer(), pn.Column( pn.layout.VSpacer(), slider,max_word_length_slider,max_word_length_toggle, generate_button, random_words_pane, toggle_definitions, pn.layout.VSpacer()), pn.layout.HSpacer(), align='center')
+layout = pn.Row(pn.layout.HSpacer(), pn.Column( pn.layout.VSpacer(), slider,max_word_length_slider,max_word_length_toggle, generate_button, random_words_pane, toggle_definitions, pn.layout.VSpacer()), pn.layout.HSpacer(), sidebar, align='center')
 
 # css = """
 # .bk-root {
