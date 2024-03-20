@@ -1,1 +1,0 @@
-python -m panel serve --show "C:\Users\Jokme\Freestyle Trainer\app.py" --dev
