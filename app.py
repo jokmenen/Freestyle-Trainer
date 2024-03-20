@@ -4,7 +4,7 @@ from get_definitions import get_definitions
 import json
 import pandas as pd
 
-pn.extension()
+pn.extension(theme='dark')
 
 WOORDENLIJST_NAME = 'common_words'
 
